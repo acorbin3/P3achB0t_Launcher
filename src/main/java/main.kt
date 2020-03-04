@@ -18,7 +18,6 @@ object Main {
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start()
-                .waitFor(60, TimeUnit.MINUTES)
     }
     var validationKey = ""
     @JvmStatic
@@ -80,9 +79,10 @@ object Main {
                     println("Curr dir: $path")
                     val command = "java -jar ${clientJar.absoluteFile} -key $validationKey"
                     println(command)
-                    GlobalScope.launch {
+                    val thread = Thread{
                         command.runCommand(File(accountUser))
                     }
+                    thread.start()
                 }
             }
 
