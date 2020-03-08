@@ -19,7 +19,7 @@ object Main {
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start()
     }
-    var validationKey = "<insert_key>"
+    var validationKey = "_insert_key_"
     @JvmStatic
     fun main(args: Array<String>) {
         //Read the json file,
