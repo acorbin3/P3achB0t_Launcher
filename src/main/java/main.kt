@@ -19,7 +19,7 @@ object Main {
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start()
     }
-    var validationKey = ""
+    var validationKey = "<insert_key>"
     @JvmStatic
     fun main(args: Array<String>) {
         //Read the json file,
@@ -39,14 +39,28 @@ object Main {
 
         val curDir = File(System.getProperty("user.dir"))
         var clientJar = File("")
+        var launcherJar = File("")
         curDir.listFiles().iterator().forEach {
             if(it.name.contains(".jar") && !it.name.contains("P3achB0t_Launcher")){
                 clientJar = it
             }
+            else if(it.name.contains(".jar") && it.name.contains("P3achB0t_Launcher")){
+                launcherJar = it
+            }
         }
+        val launcherBat = File("start.bat")
+        if(!launcherBat.exists()){
+            launcherBat.createNewFile()
+            launcherBat.writeText("java -jar \"${launcherJar.absoluteFile}\" -key $validationKey")
+        }
+
+        //TODO update client jar
+        //
+
         curDir.listFiles().iterator().forEach {
 
-            if(it.name.contains(".json")){
+            if(it.name.endsWith(".json")){
+                println("Parsing: ${it.absoluteFile}")
                 val ins: InputStream = it.inputStream()
                 val content = ins.readBytes().toString(Charset.defaultCharset())
                 val gson = Gson()
@@ -74,10 +88,18 @@ object Main {
                     val jsonAccountPretty = gsonPretty.toJson(arrayOf(it))
                     singleAccountJson.writeText(jsonAccountPretty)
 
+                    //Create batch file for easy launching individual accounts
+                    val command = "java -jar \"${clientJar.absoluteFile}\" -key $validationKey"
+                    val batchFile = File("$accountUser/start.bat")
+                    println(batchFile)
+                    if(!batchFile.exists()){
+                        batchFile.createNewFile()
+                    }
+                    batchFile.writeText(command)
+
                     //Launch the JAR
                     val path = Paths.get("").toAbsolutePath().toString()
                     println("Curr dir: $path")
-                    val command = "java -jar ${clientJar.absoluteFile} -key $validationKey"
                     println(command)
                     val thread = Thread{
                         command.runCommand(File(accountUser))
